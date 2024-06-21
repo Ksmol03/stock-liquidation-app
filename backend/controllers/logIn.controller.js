@@ -4,7 +4,6 @@ import crypto from 'crypto';
 
 export const logInController = async (req, res) => {
     const {username, password} = req.body;
-    const sessionKey = req.cookies.sessionKey;
 
     //Check if user is already logged in
     if (req.cookies.sessionKey) {
@@ -31,4 +30,15 @@ export const logInController = async (req, res) => {
     if (!bcypt.compareSync(password, user.hashed_password)) {
         return res.status(401).json({message: 'Invalid username or password.'})
     }
+
+    //Send session key to user
+    const sessionKey = crypto.randomBytes(16).toString('hex');
+    const insertSessionKeyToSessions = 'INSERT INTO sessions (session_key, username) VALUES (?, ?)';
+    const resultSessionKeyToSessions = await queryDatabase(insertSessionKeyToSessions, [sessionKey, username]);
+    res.cookie('sessionKey', sessionKey, {
+        httpOnly: true,
+        maxAge: 1000* 60 * 60 * 24, // 1 day in milliseconds
+        path: '/'
+    });
+    return res.json({message: 'Successfully logged in.'})
 }
