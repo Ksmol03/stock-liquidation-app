@@ -1,11 +1,11 @@
 import { queryDatabase } from "../database/mySQL.database.js";
 
-export const authenticateUserController = async (req, res, next) => {
+export const authenticateUserMiddleware = async (req, res, next) => {
     const sessionKey = req.cookies.sessionKey;
 
     //Check if user is logged in
     if (!sessionKey) {
-        return res.status(401).json({message: 'Unauthenticated.'});
+        return res.status(401).json({message: 'Unauthorized.'});
     }
 
     try {
@@ -14,7 +14,7 @@ export const authenticateUserController = async (req, res, next) => {
         const foundUsername = await queryDatabase(findUsernameQuery, [sessionKey]);
 
         if (foundUsername.length == 0) {
-            return res.status(401).json({message: 'Unauthenticated.'});
+            return res.status(401).json({message: 'Unauthorized.'});
         }
 
         //Save found username in res.locals
