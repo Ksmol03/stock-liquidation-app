@@ -16,6 +16,7 @@ export const findPermissionUtil = async (permission, username) => {
         }
     });
 
+    //Result
     if (permissionsList.length == 0) {
         return false;
     } else {
