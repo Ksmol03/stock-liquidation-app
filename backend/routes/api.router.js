@@ -8,10 +8,10 @@ import { authenticateUserController } from '../controllers/authenticateUser.cont
 
 export const router = express.Router();
 
-router.get('/logIn', logInController);
-router.get('/logOut', logOutController);
+router.post('/logIn', logInController);
+router.delete('/logOut', logOutController);
 router.get('/authenticate', authenticateUserController)
 
 router.use(authenticateUserMiddleware);
 router.get('/listItems', listItemsController);
-router.get('/updateItem', updateItemController);
+router.put('/updateItem', updateItemController);

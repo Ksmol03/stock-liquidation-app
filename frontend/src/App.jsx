@@ -1,51 +1,51 @@
-import React, { useEffect, useState } from 'react'
-import axios from 'axios'
+import React, { createContext, useEffect, useState } from 'react';
+import axios from 'axios';
+import LogIn from './components/LogIn';
+import Panel from './components/Panel';
+import ErrorPanel from './components/Error';
+
+export const AuthContext = createContext();
 
 const App = () => {
-  const [userData, setUserData] = useState(null);
+    const [userData, setUserData] = useState(null);
+    const [serverError, setServerError] = useState(false);
 
-  useEffect(() => {
-    authenticateUser();
-  }, []);
+    useEffect(() => {
+        //Check if user is logged in
+        authenticateUser(setUserData);
+    }, []);
 
-  const authenticateUser = () => {
-    axios.get('/api/authenticate')
-      .then(response => {
-        if (response.status == 200) {
-          console.log('Authenticated!');
-          setUserData(response.data);
-        }
-      })
-      .catch(err => console.log('Error: ', err));
-  }
+    //Set userData if user is authenticated
+    const authenticateUser = () => {
+        axios
+            .get('/api/authenticate')
+            .then((response) => {
+                const data = response.data;
+                if (data.message == 'Unauthenticated.') {
+                    console.log(data.message);
+                    setUserData(null);
+                } else {
+                    console.log(data);
+                    setUserData(data);
+                }
+            })
+            .catch((error) => {
+                setServerError(true);
+                console.error('Error: ', error);
+            });
+    };
 
-  const logIn = () => {
-    axios.post('/api/login', {username: 'admin', password: 'admin'})
-      .then(() => {
-        authenticateUser();
-      });
-  };
+    //Check if server error has been thrown
+    if (serverError) {
+        return <ErrorPanel />;
+    }
 
-  const logOut = () => {
-    axios.delete('/api/logout');
-    setUserData(null);
-  }
-
-  if (userData) {
+    //App
     return (
-      <>
-        <div>Hello, {userData.username}!</div>
-        <button onClick={logOut}>Log Out</button>
-      </>
-    )
-  } else {
-    return (
-      <>
-        <div>Please, Log In</div>
-        <button onClick={logIn}>Log In</button>
-      </>
-    )
-  }
-}
+        <AuthContext.Provider value={{ userData, setUserData, authenticateUser, setServerError }}>
+            {userData ? <Panel /> : <LogIn />}
+        </AuthContext.Provider>
+    );
+};
 
-export default App
+export default App;
