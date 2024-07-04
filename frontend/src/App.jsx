@@ -1,4 +1,5 @@
 import React, { createContext, useEffect, useState } from 'react';
+import './App.css';
 import axios from 'axios';
 import LogIn from './components/LogIn';
 import Panel from './components/Panel';
@@ -22,10 +23,8 @@ const App = () => {
             .then((response) => {
                 const data = response.data;
                 if (data.message == 'Unauthenticated.') {
-                    console.log(data.message);
                     setUserData(null);
                 } else {
-                    console.log(data);
                     setUserData(data);
                 }
             })
@@ -42,8 +41,12 @@ const App = () => {
 
     //App
     return (
-        <AuthContext.Provider value={{ userData, setUserData, authenticateUser, setServerError }}>
-            {userData ? <Panel /> : <LogIn />}
+        <AuthContext.Provider value={{ userData, setServerError }}>
+            {userData ? (
+                <Panel setUserData={setUserData} />
+            ) : (
+                <LogIn authenticateUser={authenticateUser} />
+            )}
         </AuthContext.Provider>
     );
 };

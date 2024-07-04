@@ -1,0 +1,13 @@
+.loading-div {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    z-index: 10;
+}
+
+.loading-div:hover {
+    cursor: wait;
+}

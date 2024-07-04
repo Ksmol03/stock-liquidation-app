@@ -2,9 +2,10 @@ import React, { useContext, useState } from 'react';
 import { AuthContext } from '../App';
 import axios from 'axios';
 
-const LogIn = () => {
+const LogIn = ({ authenticateUser }) => {
     const [credentials, setCredentials] = useState({ username: '', password: '' });
-    const { authenticateUser, setServerError } = useContext(AuthContext);
+    const [loading, setLoading] = useState(false);
+    const { setServerError } = useContext(AuthContext);
 
     //Update username and password inputs
     const updateCredentials = (e) => {
@@ -14,15 +15,22 @@ const LogIn = () => {
         });
     };
 
-    //Submit login
+    //Handle login
     const handleSubmit = (e) => {
         e.preventDefault();
+        setLoading(true);
 
-        axios.post('/api/login', credentials).catch((error) => {
-            setServerError(true);
-            console.error('Error: ', error);
-        });
-        authenticateUser();
+        axios
+            .post('/api/login', credentials)
+            .then(() => {
+                authenticateUser();
+                setCredentials({ username: '', password: '' });
+                setLoading(false);
+            })
+            .catch((error) => {
+                setServerError(true);
+                console.error('Error: ', error);
+            });
     };
 
     return (
@@ -43,6 +51,7 @@ const LogIn = () => {
                 />
                 <button type='submit'>Submit</button>
             </form>
+            {loading && <div className='loading-div'></div>}
         </>
     );
 };

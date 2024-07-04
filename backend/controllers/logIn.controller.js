@@ -31,8 +31,12 @@ export const logInController = async (req, res) => {
 
         //Send session key to user
         const sessionKey = crypto.randomBytes(16).toString('hex');
-        const insertSessionKeyToSessions = 'INSERT INTO sessions (session_key, username) VALUES (?, ?)';
-        const resultSessionKeyToSessions = await queryDatabase(insertSessionKeyToSessions, [sessionKey, username]);
+        const insertSessionKeyToSessions =
+            'INSERT INTO sessions (session_key, username) VALUES (?, ?)';
+        const resultSessionKeyToSessions = await queryDatabase(insertSessionKeyToSessions, [
+            sessionKey,
+            username,
+        ]);
         res.cookie('sessionKey', sessionKey, {
             httpOnly: true,
             maxAge: 1000 * 60 * 60 * 24, // 1 day in milliseconds
